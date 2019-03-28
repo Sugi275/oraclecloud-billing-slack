@@ -1,40 +1,32 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	"io/ioutil"
-	"net/http"
+
+	"github.com/Sugi275/oraclecloud-billing-slack/src/loglib"
+	"github.com/Sugi275/oraclecloud-billing-slack/src/oraclecloud"
+	"github.com/Sugi275/oraclecloud-billing-slack/src/slack"
 )
 
-// OracleBillingClient OracleBillingClient
-type OracleBillingClient struct {
-	URL                    string
-	UserName               string
-	Password               string
-	IdentityCloudServiceID string
-}
-
 func main() {
-	url := "https://itra.oraclecloud.com/metering/api/v1/usagecost/cacct-8da51d892ccf453cae8c82145fcbc345?startTime=2019-03-26T00:00:00.000Z&endTime=2019-03-27T00:00:00.000Z&timeZone=UTC&usageType=DAILY"
-	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Set("X-ID-TENANT-NAME", "idcs-4833af834c9a44e0b20738c3029777a6")
-	req.SetBasicAuth("api", "gojs90jgr908ydsio'&(IOHi")
-	client := new(http.Client)
-	res, err := client.Do(req)
-
+	oracleBillingData, err := oraclecloud.GetOracleBillingData()
 	if err != nil {
-		panic(err.Error())
-	}
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-
-	if err != nil {
-		panic(err.Error())
+		loglib.Sugar.Error(err)
+		return
 	}
 
-	buf := bytes.NewBuffer(body)
-	html := buf.String()
-	fmt.Println(html)
+	err = slack.PostBilling(oracleBillingData)
+	if err != nil {
+		loglib.Sugar.Error(err)
+		return
+	}
+
+	for _, item := range oracleBillingData.YesterdayBilling {
+		println(item.ServiceName)
+		println(item.ResourceName)
+		fmt.Printf("%.4f\n", item.Billing)
+		println(item.Billing)
+		println(item.Currency)
+		println()
+	}
 }
