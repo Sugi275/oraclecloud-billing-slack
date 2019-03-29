@@ -67,14 +67,24 @@ func PostBilling(billing oraclecloud.OracleBillingDataList) error {
 		return err
 	}
 
+	loglib.Sugar.Infof("Message to Slack. Message:%s", slackJSON)
+
 	req, _ := http.NewRequest("POST", slackIncomingURL, bytes.NewBuffer([]byte(slackJSON)))
 	req.Header.Set("Content-type", "application/json")
 	client := &http.Client{}
-	resp, err := client.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		err := fmt.Errorf("Error send message to Slack. StatusCode:%d", res.StatusCode)
+		loglib.Sugar.Error(err)
+		return err
+	}
+
+	loglib.Sugar.Infof("Sucsessful to send message to Slack.")
 
 	return nil
 }

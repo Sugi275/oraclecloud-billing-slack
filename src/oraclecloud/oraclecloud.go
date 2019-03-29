@@ -87,6 +87,10 @@ func GetOracleBillingData() (OracleBillingDataList, error) {
 		return oracleBillingDataList, err
 	}
 
+	loglib.Sugar.Infof("Logging OracleBillingClientParameter. Username:%s, AccountID:%s, IDCSID:%s, YesterdayStartDate:%s, YesterdayEndDate:%s, MonthStartDate:%s, MonthEndDate:%s",
+		client.UserName, client.AccountID, client.IDCSID, client.YesterdayStartDate,
+		client.YesterdayEndDate, client.MonthStartDate, client.MonthEndDate)
+
 	oracleBillingDataList, err = getOracleBillingList(client)
 	oracleBillingDataList.Currency = "JPY"
 	oracleBillingDataList.YesterdayStartDate = client.YesterdayStartDate
@@ -235,6 +239,9 @@ func getOracleBillingData(oracleBillingClient OracleBillingClient, duration stri
 	req.Header.Set("X-ID-TENANT-NAME", oracleBillingClient.AccountID)
 	req.SetBasicAuth(oracleBillingClient.UserName, oracleBillingClient.Password)
 	client := new(http.Client)
+
+	loglib.Sugar.Infof("Request to OracleCloud. URL:%s", url)
+
 	res, err := client.Do(req)
 
 	if err != nil {
@@ -248,6 +255,8 @@ func getOracleBillingData(oracleBillingClient OracleBillingClient, duration stri
 	}
 
 	err = json.Unmarshal(body, &billingResponse)
+
+	loglib.Sugar.Infof("Request is sucessful. Response:%s", billingResponse)
 
 	return billingResponse, nil
 }
