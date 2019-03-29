@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  branch = "master"
+  digest = "1:d6110cd6dd16a703573cde9699c85f65fc37557c943ada4c5b6b1bf64f0a100b"
+  name = "github.com/fnproject/fdk-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "43f4623aa268e148478214331b07e48827506e83"
+
+[[projects]]
   digest = "1:3c1a69cdae3501bf75e76d0d86dc6f2b0a7421bc205c0cb7b96b19eed464a34d"
   name = "go.uber.org/atomic"
   packages = ["."]
@@ -35,6 +43,9 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["go.uber.org/zap"]
+  input-imports = [
+    "github.com/fnproject/fdk-go",
+    "go.uber.org/zap",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
